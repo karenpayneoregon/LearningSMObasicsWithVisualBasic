@@ -1,9 +1,5 @@
-﻿Imports System.Collections.Specialized
-Imports System.IO
-Imports System.Text
-Imports Microsoft.SqlServer.Management.Sdk.Sfc
+﻿Imports System.IO
 Imports Microsoft.SqlServer.Management.Smo
-Imports Microsoft.SqlServer.SmoExtended
 
 Namespace Classes
     Public Class DatabaseInformation

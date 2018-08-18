@@ -60,9 +60,6 @@ Namespace Classes
             Dim srv = New Server(pServerName)
 
             Try
-
-                Dim test = srv.Databases.Count
-
                 serverDetails.Name = pServerName
                 serverDetails.Server = srv
                 serverDetails.Exists = True
@@ -81,7 +78,7 @@ Namespace Classes
             End Try
 
             Return serverDetails
-            'https://www.codeproject.com/Articles/162684/SMO-Tutorial-of-n-Scripting
+
         End Function
         ''' <summary>
         ''' Get all databases for the default server
