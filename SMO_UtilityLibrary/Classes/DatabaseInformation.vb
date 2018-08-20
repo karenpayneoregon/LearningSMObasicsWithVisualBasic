@@ -3,6 +3,7 @@ Imports Microsoft.SqlServer.Management.Smo
 
 Namespace Classes
     Public Class DatabaseInformation
+        Inherits BaseExceptionsHandler
 
         ''' <summary>
         ''' Get database on default server
@@ -31,7 +32,10 @@ Namespace Classes
         ''' <param name="pNewDatabase">Non-existing database</param>
         ''' <returns>True on successully completing the copy, false on failure</returns>
         Public Function CopyDatabase(pOriginalDatabase As String, pNewDatabase As String) As Boolean
-            Dim srv As Server = New Server
+
+            mHasException = False
+
+            Dim srv = New Server
             Dim db As Database
 
             Try
@@ -40,20 +44,67 @@ Namespace Classes
                 dbCopy = New Database(srv, pNewDatabase)
                 dbCopy.Create()
 
-                Dim xfr As Transfer
-                xfr = New Transfer(db)
-                xfr.CopyAllTables = True
-                xfr.Options.WithDependencies = True
-                xfr.Options.ContinueScriptingOnError = True
-                xfr.DestinationDatabase = pNewDatabase
-                xfr.DestinationServer = srv.Name
-                xfr.DestinationLoginSecure = True
-                xfr.Options.DriAllKeys = True
-                xfr.CopySchema = True
+                Dim trans As Transfer
+                trans = New Transfer(db)
+                trans.CopyAllTables = True
+                trans.Options.WithDependencies = True
+                trans.Options.ContinueScriptingOnError = True
+                trans.DestinationDatabase = pNewDatabase
+                trans.DestinationServer = srv.Name
+                trans.DestinationLoginSecure = True
+                trans.Options.DriAllKeys = True
+                trans.CopySchema = True
 
-                xfr.TransferData()
+                trans.TransferData()
+
                 Return True
+
             Catch ex As Exception
+                mHasException = True
+                mLastException = ex
+                Return False
+            End Try
+
+        End Function
+        ''' <summary>
+        ''' Using the named server copy one database to a new database with tables,
+        ''' data, primary keys
+        ''' </summary>
+        ''' <param name="pServer">Existing SQL-Server instance name</param>
+        ''' <param name="pOriginalDatabase">Existing database</param>
+        ''' <param name="pNewDatabase">Non-existing database</param>
+        ''' <returns>True on successully completing the copy, false on failure</returns>
+        Public Function CopyDatabase(pServer As String, pOriginalDatabase As String, pNewDatabase As String) As Boolean
+
+            mHasException = False
+
+            Dim srv = New Server(pServer)
+            Dim db As Database
+
+            Try
+                db = srv.Databases(pOriginalDatabase)
+                Dim dbCopy As Database
+                dbCopy = New Database(srv, pNewDatabase)
+                dbCopy.Create()
+
+                Dim trans As Transfer
+                trans = New Transfer(db)
+                trans.CopyAllTables = True
+                trans.Options.WithDependencies = True
+                trans.Options.ContinueScriptingOnError = True
+                trans.DestinationDatabase = pNewDatabase
+                trans.DestinationServer = srv.Name
+                trans.DestinationLoginSecure = True
+                trans.Options.DriAllKeys = True
+                trans.CopySchema = True
+
+                trans.TransferData()
+
+                Return True
+
+            Catch ex As Exception
+                mHasException = True
+                mLastException = ex
                 Return False
             End Try
 
@@ -69,8 +120,9 @@ Namespace Classes
             Dim result As New DatabaseDetails With {.Exists = False}
             Dim srv = New Server(pServer)
 
-            Console.WriteLine(srv.InstallDataDirectory)
-            Console.WriteLine(srv.ConnectionContext.DatabaseEngineType.ToString())
+            'Console.WriteLine(srv.InstallDataDirectory)
+            'Console.WriteLine(srv.ConnectionContext.DatabaseEngineType.ToString())
+
             Dim db = srv.Databases(pDatabaseName)
 
             If db IsNot Nothing Then
@@ -108,17 +160,88 @@ Namespace Classes
 
         End Function
         ''' <summary>
+        ''' If database exists on default server drop the database, for this demo
+        ''' we are using a hard-coded database on the default server.
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function WhenDatabaseExistsDrop(pDatabaseName As String) As DatabaseExistsResult
+            Try
+                Dim srv = New Server()
+                Dim result As New DatabaseDetails With {.Exists = False}
+                Dim db = srv.Databases(pDatabaseName)
+
+                If db IsNot Nothing Then
+                    result.Exists = True
+                    result.Name = pDatabaseName
+                    result.Database = db
+                    srv.Databases(pDatabaseName).Drop()
+
+                    Return DatabaseExistsResult.Dropped
+                Else
+                    Return DatabaseExistsResult.DropNotRequired
+                End If
+
+            Catch ex As Exception
+                '
+                ' Common reason to land here is the database is "in use"
+                ' which means it can not be dropped. Now it's possible to
+                ' force remove a database via 
+                '
+                '    srv.KillDatabase(pDatabaseName)
+                '
+                ' yet that in many cases would be rude if someone is using the
+                ' database and this code dropped it.
+                '
+                ' See the following http://www.blackwasp.co.uk/SQLRestrictedUser.aspx
+                '
+                mHasException = True
+                mLastException = ex
+                Return DatabaseExistsResult.ExceptionThrown
+            End Try
+
+
+        End Function
+        ''' <summary>
         ''' This code sample shows how to create and drop a table with events.
-        ''' Requirements
-        ''' 1. The database exists.
-        ''' 2. The table does not exists.
+        ''' If the database exists it is dropped, no prompting.
         ''' 
         ''' On table create an event is raised indicating a table was created
         ''' while a message is shown when the table is dropped
         ''' </summary>
-        Public Sub CreateAndDropTableWithEvents()
+        ''' <remarks>
+        ''' * Alternate is to use TSQL script to do the same work, here the advantage
+        '''   for some is being able to inspect/alter properties when creating or after
+        '''   creating.
+        ''' * What can go wrong: There is a live connection on the database which would
+        '''   cause the drop method to fail, in this case raise an exception which here
+        '''   is remembered and sent back to the calling method within the form.
+        ''' </remarks>
+        Public Function CreateAndDropTableWithEvents(pDatabaseName As String) As Boolean
+
+            mHasException = False
+
+            Dim dropResults = WhenDatabaseExistsDrop(pDatabaseName)
             Dim srv = New Server()
-            Dim database = srv.Databases("CreatedInVisualStudio")
+
+            If dropResults = DatabaseExistsResult.Dropped OrElse dropResults = DatabaseExistsResult.DropNotRequired Then
+
+                Dim db As New Database(srv, pDatabaseName)
+                'Define a Schema object variable by supplying the parent database and name arguments in the constructor.
+                'this is used in DemoTable below.
+                Dim schema As Schema
+                schema = New Schema(db, "kp")
+                schema.Owner = "dbo"
+
+                db.Create()
+
+                'Create the schema on the instance of SQL Server.
+                schema.Create()
+
+            Else
+                Return False
+            End If
+
+            Dim database = srv.Databases(pDatabaseName)
 
             Dim databaseCreateEventSet As New DatabaseEventSet
             databaseCreateEventSet.CreateTable = True
@@ -132,29 +255,70 @@ Namespace Classes
             database.Events.StartEvents()
 
             'Create a table on the database.
+            'Create three most populate field types, primary key; integer, string field, date field
             Dim tb As Table
-            tb = New Table(database, "Test_Table")
-            Dim mycol1 As Column
-            mycol1 = New Column(tb, "Name", DataType.NChar(50))
-            mycol1.Collation = "Latin1_General_CI_AS"
-            mycol1.Nullable = True
-            tb.Columns.Add(mycol1)
+            tb = New Table(database, "DemoTable")
+
+            Dim primaryIdentifierColumn As New Column(tb, "ID", DataType.Int)
+            primaryIdentifierColumn.Identity = True
+            primaryIdentifierColumn.IdentitySeed = 1
+            primaryIdentifierColumn.Nullable = False
+            tb.Columns.Add(primaryIdentifierColumn)
+
+            Dim nameColumn As Column
+            nameColumn = New Column(tb, "Name", DataType.NChar(50))
+            nameColumn.Collation = "Latin1_General_CI_AS"
+            nameColumn.Nullable = True
+            tb.Columns.Add(nameColumn)
+
+            Dim joinDateColumn As New Column(tb, "JoinedDate", DataType.DateTime)
+            joinDateColumn.AddDefaultConstraint() ' you can specify constraint name here as well
+            joinDateColumn.DefaultConstraint.Text = "GETDATE()"
+            tb.Columns.Add(joinDateColumn)
+
+            ' Add primary key index to the table
+            Dim primaryKeyIndex As New Index(tb, "PK_TestTableIdentifier")
+            primaryKeyIndex.IndexKeyType = IndexKeyType.DriPrimaryKey
+            primaryKeyIndex.IndexedColumns.Add(New IndexedColumn(primaryKeyIndex, "ID"))
+            tb.Indexes.Add(primaryKeyIndex)
+
+            tb.Schema = "kp"
             tb.Create()
 
-            'Remove the table.
-            tb.Drop()
+            '
+            ' Read script to insert serveral record from disk followed by performing the inserts/
+            '
+            Try
+                database.ExecuteNonQuery(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "DemoTableRecord.txt")))
+            Catch ex As Exception
+                mHasException = True
+                mLastException = ex
+                database.Events.StopEvents()
+            End Try
 
-            'Wait until the events have occured.
-            Dim outer As Integer
-            Dim inner As Integer
-            For outer = 1 To 1000000000
-                inner = outer * 2
-            Next
+            Try
+                'Remove the table. 
+                tb.Drop()
+                ' drop database
+                database.Drop()
 
-            'Stop event handling listening
-            database.Events.StopEvents()
+                'Wait until the events have occured.
+                Dim dummy As Integer
+                For outer = 1 To 1000000000
+                    dummy = outer * 2
+                Next
 
-        End Sub
+            Catch ex As Exception
+                mHasException = True
+                mLastException = ex
+            Finally
+                'Stop event handling listening
+                database.Events.StopEvents()
+            End Try
+
+            Return True
+
+        End Function
         ''' <summary>
         ''' Given an existing database with tables (best with data)
         ''' will generate a text file for each table that has insert

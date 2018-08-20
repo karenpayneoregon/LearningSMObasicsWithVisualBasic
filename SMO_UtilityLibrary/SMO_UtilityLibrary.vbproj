@@ -48,6 +48,10 @@
     <Reference Include="Microsoft.SqlServer.Smo, Version=13.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SqlServer.SmoExtended, Version=13.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SqlServer.SqlEnum, Version=13.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
+    <Reference Include="Microsoft.SqlServer.SqlWmiManagement, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files\Microsoft SQL Server\130\SDK\Assemblies\Microsoft.SqlServer.SqlWmiManagement.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -68,12 +72,15 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\BaseExceptionsHandler.vb" />
     <Compile Include="Classes\ColumnDetails.vb" />
     <Compile Include="Classes\DatabaseAndTables.vb" />
     <Compile Include="Classes\DatabaseDetails.vb" />
+    <Compile Include="Classes\DatabaseExistsResult.vb" />
     <Compile Include="Classes\DatabaseInformation.vb" />
     <Compile Include="Classes\ForeignKeysDetails.vb" />
     <Compile Include="Classes\SmoTableCreateArgs.vb" />
+    <Compile Include="Classes\SqlService.vb" />
     <Compile Include="Interfaces\IDetails.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

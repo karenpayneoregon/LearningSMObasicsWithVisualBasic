@@ -1,0 +1,4 @@
+﻿INSERT INTO kp.DemoTable (Name, JoinedDate)  VALUES ( N'Karen', N'2018-08-18T12:15:31.127' );
+INSERT INTO kp.DemoTable (Name, JoinedDate)  VALUES ( N'Mary ', N'2018-08-18T12:15:34.223' ) ;
+INSERT INTO kp.DemoTable (Name, JoinedDate)  VALUES ( N'Jane', N'2018-08-18T12:15:37.103' ) ;
+INSERT INTO kp.DemoTable (Name, JoinedDate)  VALUES ( N'Mark', N'2018-08-18T12:15:42.467' );

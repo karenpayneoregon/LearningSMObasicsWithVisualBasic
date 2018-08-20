@@ -300,8 +300,19 @@ Public Class Form1
 
     End Sub
     ''' <summary>
-    ''' Demo to create a new table in an existing database then immediately drop the
+    ''' Demo to create a new table in an database which if exists is dropped then immediately drop the
     ''' newly created table to demostrate working with events.
+    ''' 
+    ''' HOW TO RUN:
+    ''' 1. Please a breakpoint on CreateAndDropTableWithEvents
+    ''' 2. Step through the code, when you hit tb.Drop() pause.
+    ''' 3. Connect to SQL-Server via Server Explorer in Visual Studio or via SSMS.
+    ''' 4. Look for the database CreatedForCodeSample, if not there do a refresh on the database.
+    ''' 5. Examine the table and indices.
+    ''' 6. Pop out of the database leaving nothing open.
+    ''' 7. Continue debugging.
+    ''' 8. table is dropped followed by database being dropped.
+    ''' 8. Re-examine the database, it will be gone.
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
@@ -310,7 +321,9 @@ Public Class Form1
         Dim ops As New DatabaseInformation
         AddHandler ops.SmoTableCreate, AddressOf CreateTableEvent
 
-        ops.CreateAndDropTableWithEvents()
+        If Not ops.CreateAndDropTableWithEvents("CreatedForCodeSample") Then
+            MessageBox.Show(ops.LastExceptionMessage)
+        End If
 
     End Sub
     ''' <summary>
@@ -332,5 +345,10 @@ Public Class Form1
     Private Sub cmdScriptTables_Click(sender As Object, e As EventArgs) Handles cmdScriptTables.Click
         Dim ops As New DatabaseInformation
         ops.ScriptDatabaseTables()
+    End Sub
+
+    Private Sub cmdService_Click(sender As Object, e As EventArgs) Handles cmdService.Click
+        Dim ops = New SqlService
+        ops.Demo()
     End Sub
 End Class
