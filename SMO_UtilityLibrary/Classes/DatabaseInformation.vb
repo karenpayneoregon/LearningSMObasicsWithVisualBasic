@@ -327,7 +327,8 @@ Namespace Classes
         ''' Requirements
         '''     Database exists (replace NorthWindAzure with your database)
         ''' </summary>
-        Public Sub ScriptDatabaseTables()
+        Public Function ScriptDatabaseTables() As List(Of String)
+            Dim fileNames As New List(Of String) From {"Tables for NorthWindAzure", ""}
             ' uses default server
             Dim srv = New Server()
 
@@ -346,10 +347,13 @@ Namespace Classes
 
             For Each table As Table In tables
                 scrp.Options.FileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, table.Name & ".txt")
+                fileNames.Add(Path.GetFileName(scrp.Options.FileName))
                 scrp.EnumScript(New SqlSmoObject() {table})
             Next
 
-        End Sub
+            Return fileNames
+
+        End Function
         ''' <summary>
         ''' Used in CreateAndDropTableWithEvents to handling pushing results
         ''' of create and drop operations by EventType

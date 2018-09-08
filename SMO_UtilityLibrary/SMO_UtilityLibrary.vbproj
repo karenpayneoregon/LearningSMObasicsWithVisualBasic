@@ -80,7 +80,6 @@
     <Compile Include="Classes\DatabaseInformation.vb" />
     <Compile Include="Classes\ForeignKeysDetails.vb" />
     <Compile Include="Classes\SmoTableCreateArgs.vb" />
-    <Compile Include="Classes\SqlService.vb" />
     <Compile Include="Interfaces\IDetails.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

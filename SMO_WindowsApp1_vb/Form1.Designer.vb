@@ -46,7 +46,6 @@ Partial Class Form1
         Me.cmdScriptTables = New System.Windows.Forms.Button()
         Me.txtWithEvents = New System.Windows.Forms.TextBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.cmdService = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
@@ -197,7 +196,6 @@ Partial Class Form1
         'GroupBox1
         '
         Me.GroupBox1.BackColor = System.Drawing.SystemColors.Control
-        Me.GroupBox1.Controls.Add(Me.cmdService)
         Me.GroupBox1.Controls.Add(Me.cmdCopyDatabase)
         Me.GroupBox1.Controls.Add(Me.txtDatabaseCopyName)
         Me.GroupBox1.Controls.Add(Me.lstDatabases)
@@ -269,15 +267,6 @@ Partial Class Form1
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Events"
         '
-        'cmdService
-        '
-        Me.cmdService.Location = New System.Drawing.Point(232, 90)
-        Me.cmdService.Name = "cmdService"
-        Me.cmdService.Size = New System.Drawing.Size(266, 23)
-        Me.cmdService.TabIndex = 24
-        Me.cmdService.Text = "Service"
-        Me.cmdService.UseVisualStyleBackColor = True
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -337,5 +326,4 @@ Partial Class Form1
     Friend WithEvents cmdScriptTables As Button
     Friend WithEvents txtWithEvents As TextBox
     Friend WithEvents GroupBox2 As GroupBox
-    Friend WithEvents cmdService As Button
 End Class

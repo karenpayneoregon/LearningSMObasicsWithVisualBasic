@@ -3,9 +3,11 @@ Imports System.Text
 Imports Microsoft.SqlServer.Management.Smo
 Imports SMO_UtilityLibrary
 Imports SMO_UtilityLibrary.Classes
+Imports Tulpep.NotificationWindow
 
 Public Class Form1
     Private _serverNames As List(Of String)
+    'Private myAnimator As New FormAnimator(Me, FormAnimator.AnimationMethod.Slide, FormAnimator.AnimationDirection.Up, 400)
     ''' <summary>
     ''' Get all available servers
     ''' </summary>
@@ -22,6 +24,13 @@ Public Class Form1
 
         If ListBox1.Items.Count = 0 Then
             MessageBox.Show("Found no servers present.")
+        Else
+            Dim popupNotifier1 = New PopupNotifier
+            popupNotifier1.ContentText = "Server(s) loaded"
+            popupNotifier1.BodyColor = Color.FloralWhite
+            popupNotifier1.ContentPadding = New Padding(12)
+            popupNotifier1.Delay = 2000
+            popupNotifier1.Popup()
         End If
     End Sub
     Private Async Function GetAvailableServerNames() As Task
@@ -46,6 +55,12 @@ Public Class Form1
             lstDatabases.DataSource = Nothing
             MessageBox.Show($"Getting all databases for server {ListBox1.Text}")
             lstDatabases.DataSource = databaseList.Select(Function(db) db.Name).ToList()
+            Dim popupNotifier1 = New PopupNotifier
+            popupNotifier1.ContentText = "Databases have been loaded!"
+            popupNotifier1.BodyColor = Color.FloralWhite
+            popupNotifier1.ContentPadding = New Padding(12)
+            popupNotifier1.Delay = 2000
+            popupNotifier1.Popup()
         Else
             MessageBox.Show("Please select the button 'Get available servers', allows servers to load, select a server and try again.")
             ActiveControl = cmdGetAvailableServers
@@ -290,8 +305,17 @@ Public Class Form1
             MessageBox.Show("Press Get all server then get all databases")
         End If
     End Sub
-
+    ''' <summary>
+    ''' If author's machine populate one server
+    ''' Remove all text files which may have been left over from scripting example.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
+
+        If Environment.UserName = "Karens" Then
+            ListBox1.DataSource = New List(Of String) From {"KARENS-PC"}
+        End If
 
         ' delete any files which were created with scripting demo
         Directory.GetFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory), "*.txt").
@@ -344,11 +368,12 @@ Public Class Form1
     End Sub
     Private Sub cmdScriptTables_Click(sender As Object, e As EventArgs) Handles cmdScriptTables.Click
         Dim ops As New DatabaseInformation
-        ops.ScriptDatabaseTables()
-    End Sub
-
-    Private Sub cmdService_Click(sender As Object, e As EventArgs) Handles cmdService.Click
-        Dim ops = New SqlService
-        ops.Demo()
+        Dim fileNames = ops.ScriptDatabaseTables()
+        Dim f As New ResultsForm(fileNames)
+        Try
+            f.ShowDialog()
+        Finally
+            f.Dispose()
+        End Try
     End Sub
 End Class
