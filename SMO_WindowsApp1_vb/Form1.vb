@@ -204,85 +204,92 @@ Public Class Form1
         End If
     End Sub
     Private Sub cmdTableExistFound_Click(sender As Object, e As EventArgs) Handles cmdTableExistFound.Click
-        MessageBox.Show("NorthWindAzure must exists and Customers must exists otherwise stop execution.")
-        '
-        ' NorthWindAzure must exists and Customers must exists
-        '
-        Dim ops As New TableInformation
-        If ops.TableExists("NorthWindAzure", "Customers").Exists Then
-            MessageBox.Show("Found")
-        Else
-            MessageBox.Show("Not found")
+        If My.Dialogs.Question("NorthWindAzure must exists and Customers must exists otherwise stop execution. Continue?") Then
+            '
+            ' NorthWindAzure must exists and Customers must exists
+            '
+            Dim ops As New TableInformation
+            If ops.TableExists("NorthWindAzure", "Customers").Exists Then
+                MessageBox.Show("Found")
+            Else
+                MessageBox.Show("Not found")
+            End If
         End If
     End Sub
 
     Private Sub cmdTableExistNotFound_Click(sender As Object, e As EventArgs) Handles cmdTableExistNotFound.Click
-        MessageBox.Show("NorthWindAzure must not exists and Customers must not exists otherwise stop execution.")
-        '
-        ' NorthWindAzure must exists and Customers must not exists
-        '
-        Dim ops As New TableInformation
-        If ops.TableExists("NorthWindAzure", "ABC_123").Exists Then
-            MessageBox.Show("Found")
-        Else
-            MessageBox.Show("Not found")
+
+        If My.Dialogs.Question("NorthWindAzure must not exists and Customers must not exists otherwise stop execution. Continue?") Then
+            '
+            ' NorthWindAzure must exists and Customers must not exists
+            '
+            Dim ops As New TableInformation
+            If ops.TableExists("NorthWindAzure", "ABC_123").Exists Then
+                MessageBox.Show("Found")
+            Else
+                MessageBox.Show("Not found")
+            End If
         End If
+
     End Sub
 
     Private Sub cmdColumnExistsFound_Click(sender As Object, e As EventArgs) Handles cmdColumnExistsFound.Click
-        MessageBox.Show("NorthWindAzure must exists, Customers must exists, ContactName must exist.")
-        '
-        ' NorthWindAzure must exists, Customers must exists, ContactName must exist
-        '
-        Dim ops As New TableInformation
-        If ops.ColumnExists("NorthWindAzure", "Customers", "ContactName") Then
-            Console.WriteLine("Found")
-        Else
-            Console.WriteLine("Not found")
+        If My.Dialogs.Question("NorthWindAzure must exists, Customers must exists, ContactName must exist. Continue?") Then
+            '
+            ' NorthWindAzure must exists, Customers must exists, ContactName must exist
+            '
+            Dim ops As New TableInformation
+            If ops.ColumnExists("NorthWindAzure", "Customers", "ContactName") Then
+                MessageBox.Show("Found")
+            Else
+                MessageBox.Show("Not found")
+            End If
         End If
     End Sub
 
     Private Sub cmdColumnExistNotFound_Click(sender As Object, e As EventArgs) Handles cmdColumnExistNotFound.Click
-        MessageBox.Show("NorthWindAzure must exists, Customers must exists, ContactGuitar must not exist.")
-        '
-        ' NorthWindAzure must exists, Customers must exists, ContactGuitar must not exist
-        '
-        Dim ops As New TableInformation
-        If ops.ColumnExists("NorthWindAzure", "Customers", "ContactGuitar") Then
-            MessageBox.Show("Found")
-        Else
-            MessageBox.Show("Not found")
+        If My.Dialogs.Question("NorthWindAzure must exists, Customers must exists, ContactGuitar must not exist. Continue?") Then
+            '
+            ' NorthWindAzure must exists, Customers must exists, ContactGuitar must not exist
+            '
+            Dim ops As New TableInformation
+            If ops.ColumnExists("NorthWindAzure", "Customers", "ContactGuitar") Then
+                MessageBox.Show("Found")
+            Else
+                MessageBox.Show("Not found")
+            End If
         End If
     End Sub
 
     Private Sub cmdColumnDetails_Click(sender As Object, e As EventArgs) Handles cmdColumnDetails.Click
-        MessageBox.Show("NorthWindAzure must exists, Customers must exists with columns")
-        '
-        ' NorthWindAzure must exists, Customers must exists with columns
-        '
-        Dim ops As New TableInformation
-        Dim detailResults = ops.GetColumnDetails("NorthWindAzure", "Customers")
-        '
-        ' See if there is an identity column, if so show the name
-        '
-        Dim identityColumn = detailResults.FirstOrDefault(Function(item) item.Identity)
-        If identityColumn IsNot Nothing Then
-            MessageBox.Show(identityColumn.Name)
+        If My.Dialogs.Question("NorthWindAzure must exists, Customers must exists with columns. Continue?") Then
+            '
+            ' NorthWindAzure must exists, Customers must exists with columns
+            '
+            Dim ops As New TableInformation
+            Dim detailResults = ops.GetColumnDetails("NorthWindAzure", "Customers")
+            '
+            ' See if there is an identity column, if so show the name
+            '
+            Dim identityColumn = detailResults.FirstOrDefault(Function(item) item.Identity)
+            If identityColumn IsNot Nothing Then
+                MessageBox.Show(identityColumn.Name)
+            End If
         End If
-
     End Sub
     Private Sub cmdTableKeys_Click(sender As Object, e As EventArgs) Handles cmdTableKeys.Click
-        MessageBox.Show("NorthWindAzure must exists, Customers must exists with columns")
-
-        Dim ops As New TableInformation
-        '
-        ' NorthWindAzure must exists, Customers must exists with columns
-        '
-        Dim result = ops.TableKeys("NorthWindAzure", "Customers")
-        If result.Count > 0 Then
-            Dim firstKey = result.FirstOrDefault()
-            MessageBox.Show($"Shema name: {firstKey.SchemaName} = {firstKey.TableSchema}.{firstKey.TableName}")
+        If My.Dialogs.Question("NorthWindAzure must exists, Customers must exists with columns. Continue?") Then
+            Dim ops As New TableInformation
+            '
+            ' NorthWindAzure must exists, Customers must exists with columns
+            '
+            Dim result = ops.TableKeys("NorthWindAzure", "Customers")
+            If result.Count > 0 Then
+                Dim firstKey = result.FirstOrDefault()
+                MessageBox.Show($"Shema name: {firstKey.SchemaName} = {firstKey.TableSchema}.{firstKey.TableName}")
+            End If
         End If
+
     End Sub
     ''' <summary>
     ''' Provides a default name for a copy operation
@@ -313,6 +320,9 @@ Public Class Form1
     ''' <param name="e"></param>
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles Me.Shown
 
+        '
+        ' Pre-load as it exists on the author's box
+        '
         If Environment.UserName = "Karens" Then
             ListBox1.DataSource = New List(Of String) From {"KARENS-PC"}
         End If
