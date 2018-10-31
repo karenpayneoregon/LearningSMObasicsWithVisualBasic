@@ -386,4 +386,8 @@ Public Class Form1
             f.Dispose()
         End Try
     End Sub
+    Public Sub Test()
+        Dim dtDefault As New DataTable
+        dtDefault.Rows(0).Field(Of String)("CompName")
+    End Sub
 End Class

@@ -43,8 +43,8 @@ Namespace Classes
             If database IsNot Nothing Then
 
                 result.Exists = (database.Tables.OfType(Of Table)().
-                                     Where(Function(tbl) (Not tbl.IsSystemObject)).
-                                     FirstOrDefault(Function(tbl) tbl.Name = pTableName) IsNot Nothing)
+                                        Where(Function(tbl) (Not tbl.IsSystemObject)).
+                                        FirstOrDefault(Function(tbl) tbl.Name = pTableName) IsNot Nothing)
             End If
 
             Return result
@@ -88,13 +88,13 @@ Namespace Classes
 
                     columnDetails = table.Columns.OfType(Of Column)().
                         Select(Function(col) New ColumnDetails() With
-                                  {
-                                      .Identity = col.Identity,
-                                      .DataType = col.DataType,
-                                      .Name = col.Name,
-                                      .InPrimaryKey = col.InPrimaryKey,
-                                      .Nullable = col.Nullable
-                                  }
+                                    {
+                                        .Identity = col.Identity,
+                                        .DataType = col.DataType,
+                                        .Name = col.Name,
+                                        .InPrimaryKey = col.InPrimaryKey,
+                                        .Nullable = col.Nullable
+                                    }
                         ).ToList()
 
                 End If
@@ -123,13 +123,13 @@ Namespace Classes
 
                     columnDetails = table.Columns.OfType(Of Column)().
                         Select(Function(col) New ColumnDetails() With
-                                  {
-                                      .Identity = col.Identity,
-                                      .DataType = col.DataType,
-                                      .Name = col.Name,
-                                      .InPrimaryKey = col.InPrimaryKey,
-                                      .Nullable = col.Nullable
-                                  }
+                                    {
+                                        .Identity = col.Identity,
+                                        .DataType = col.DataType,
+                                        .Name = col.Name,
+                                        .InPrimaryKey = col.InPrimaryKey,
+                                        .Nullable = col.Nullable
+                                    }
                         ).ToList()
 
                 End If
@@ -153,11 +153,11 @@ Namespace Classes
                         Dim fkds As List(Of ForeignKeysDetails) = item.EnumForeignKeys().
                                 AsEnumerable().
                                 Select(Function(row) New ForeignKeysDetails With
-                                          {
-                                              .TableSchema = row.Field(Of String)("Table_Schema"),
-                                              .TableName = row.Field(Of String)("Table_Name"),
-                                              .SchemaName = row.Field(Of String)("Name")
-                                          }
+                                            {
+                                                .TableSchema = row.Field(Of String)("Table_Schema"),
+                                                .TableName = row.Field(Of String)("Table_Name"),
+                                                .SchemaName = row.Field(Of String)("Name")
+                                            }
                                 ).ToList()
 
                         For Each ts As ForeignKeysDetails In fkds

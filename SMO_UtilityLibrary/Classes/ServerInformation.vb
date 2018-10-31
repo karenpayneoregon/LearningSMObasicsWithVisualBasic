@@ -30,10 +30,10 @@ Namespace Classes
             Await Task.Run(
                 Sub()
                     serverNames = SmoApplication.
-                              EnumAvailableSqlServers(True).
-                              AsEnumerable().
-                              Select(Function(row) row.Field(Of String)("Name")).
-                              ToList()
+                                EnumAvailableSqlServers(True).
+                                AsEnumerable().
+                                Select(Function(row) row.Field(Of String)("Name")).
+                                ToList()
                 End Sub)
 
             Return serverNames
@@ -117,6 +117,7 @@ Namespace Classes
             Return GetDatabases(pServerName).Select(Function(db) db.Name).ToList()
         End Function
         Public Function GetAllDatabasesAndTables(pServerName As String, Optional pLoadDatabases As Boolean = True) As List(Of DatabaseAndTables)
+
             Dim srvDetails = GetServer(pServerName, pLoadDatabases)
             Dim excludeDatabaseNames As String() = {"master", "model", "msdb"}
 
