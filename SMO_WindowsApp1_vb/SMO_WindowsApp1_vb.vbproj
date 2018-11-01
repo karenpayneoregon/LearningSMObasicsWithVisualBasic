@@ -143,9 +143,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DatabaseScript\CreateDatabaseTablePopulate.sql" />
     <Content Include="Scripts\DemoTableRecord.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
