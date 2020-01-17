@@ -390,4 +390,8 @@ Public Class Form1
         Dim dtDefault As New DataTable
         dtDefault.Rows(0).Field(Of String)("CompName")
     End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+    End Sub
 End Class

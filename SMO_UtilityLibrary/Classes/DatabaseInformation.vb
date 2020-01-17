@@ -5,6 +5,59 @@ Namespace Classes
     Public Class DatabaseInformation
         Inherits BaseExceptionsHandler
 
+        Public Sub BackupDatabase()
+            'Connect to the local, default instance of SQL Server.  
+            Dim srv = New Server("KARENS-PC")
+
+            Dim db As Database
+            db = srv.Databases("TaxDatabase")
+
+            'Store the current recovery model in a variable.  
+            Dim recoverymod As Integer
+            recoverymod = db.DatabaseOptions.RecoveryModel
+
+            'Define a Backup object variable.   
+            Dim bk As New Backup
+
+            'Specify the type of backup, the description, the name, and the database to be backed up.  
+            bk.Action = BackupActionType.Database
+            bk.BackupSetDescription = "Full backup of TaxDatabase"
+            bk.BackupSetName = "TaxDatabase Backup"
+            bk.Database = "TaxDatabase"
+            bk.PercentCompleteNotification = 10
+            AddHandler bk.PercentComplete, AddressOf BackupCompleted
+
+            'Declare a BackupDeviceItem by supplying the backup device file name in the constructor, 
+            'and the type of device is a file.  
+            Dim bdi As BackupDeviceItem
+            bdi = New BackupDeviceItem("Test_Full_Backup1", DeviceType.File)
+
+            'Add the device to the Backup object.  
+            bk.Devices.Add(bdi)
+
+            'Set the Incremental property to False to specify that this is a full database backup.  
+            bk.Incremental = False
+
+            'Set the expiration date.  
+            Dim backupdate = New Date(2020, 10, 5)
+            bk.ExpirationDate = backupdate
+
+            'Specify that the log must be truncated after the backup is complete.  
+            bk.LogTruncation = BackupTruncateLogType.Truncate
+
+            'Run SqlBackup to perform the full database backup on the instance of SQL Server.  
+            bk.SqlBackup(srv)
+
+        End Sub
+        ''' <summary>
+        ''' This could also be used to set a progress bar percent done
+        ''' </summary>
+        ''' <param name="sender"></param>
+        ''' <param name="e"></param>
+        Private Sub BackupCompleted(sender As Object, e As PercentCompleteEventArgs)
+            Console.WriteLine($"{e.Percent}%")
+        End Sub
+
         ''' <summary>
         ''' Get database on default server
         ''' </summary>
